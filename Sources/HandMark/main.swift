@@ -1471,6 +1471,13 @@ final class HandTracker: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate 
     private var lastTip = CGPoint.zero
     /// 预览窗口是否需要画面帧（主线程设置，隐藏后置 false 以省开销）
     var previewWanted = true
+    /// 心跳日志 Timer 的强引用。Timer 由主运行循环驱动，必须持有引用才能 invalidate，
+    /// 否则重复调用 startHeartbeat 会叠加多个 1s 定时器，导致重复日志回调。
+    private var heartbeatTimer: Timer?
+
+    deinit {
+        heartbeatTimer?.invalidate()
+    }
     // 手势优先级协调器（来自 HandMarkCore 的纯逻辑协调器，聚合捏合 + 六→握拳清屏，时间显式注入）。
     // 阶段4 以此替换阶段1 单独调用的 PinchStateMachine；捏合相位经 coordinator.pinch.phase 读取，
     // 清屏相位经 coordinator.clear.phase 读取（用于日志/预览）。
@@ -1791,7 +1798,13 @@ extension HandTracker {
 extension HandTracker {
     // 每 1 秒输出一次识别状态（含握拳逐项诊断），便于实机标定与验证
     private func startHeartbeat() {
-        Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+        // 心跳 Timer 必须在主线程创建并由主运行循环驱动；先停掉已存在的 Timer，避免重复注册。
+        if !Thread.isMainThread {
+            DispatchQueue.main.async { [weak self] in self?.startHeartbeat() }
+            return
+        }
+        heartbeatTimer?.invalidate()
+        let timer = Timer(timeInterval: 1.0, repeats: true) { [weak self] _ in
             guard let self = self else { return }
             log("心跳: 已处理帧=\(self.frameCount) 手部=\(self.handSeen ? "已识别" : "未识别") "
                 + "捏合距离=\(String(format: "%.3f", self.lastDist)) "
@@ -1832,6 +1845,15 @@ extension HandTracker {
                 + "预览帧=\(gPreview?.appliedFrames ?? 0)"
                 + "(\(Int(gPreview?.lastImageSize.width ?? 0))x\(Int(gPreview?.lastImageSize.height ?? 0)))")
         }
+        // 显式加入主运行循环的 common mode 并持有引用；后续 startHeartbeat/stopHeartbeat 才能 invalidate。
+        RunLoop.main.add(timer, forMode: .common)
+        heartbeatTimer = timer
+    }
+
+    /// 停止心跳日志并释放 Timer 引用（退出或重启摄像头时调用，避免退出后残留定时器）。
+    private func stopHeartbeat() {
+        heartbeatTimer?.invalidate()
+        heartbeatTimer = nil
     }
 
     /// 握拳判定的逐项诊断文本（实机标定用：哪一项卡住了，一眼可见）。
