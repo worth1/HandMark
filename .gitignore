@@ -16,6 +16,9 @@ tools/EventPostProbe/ProbeCLI.app/
 # ===== 由 build.sh 重新生成的资源（非源码）=====
 Resources/AppIcon.icns
 
+# 正式交付产物：由 build.sh 重新生成，不纳入版本库（显式列出，非 *.app 通配）
+HandMark.app/
+
 # ===== macOS 杂项 =====
 .DS_Store
 

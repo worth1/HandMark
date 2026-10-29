@@ -1377,7 +1377,6 @@ private weak var gOverlay: OverlayView?
 private let gPageFlipper = PageFlipper()
 // PPT 翻页默认机制：AppleScript 控制「正在放映」的 PowerPoint（不依赖键盘焦点、不切前台窗口）。
 // CGEvent（gPageFlipper）暂时保留，但默认关闭自动回退：权限/放映/脚本错误各自返回并记录，不静默兜底。
-private let gPowerPoint = PowerPointController()
 // 双演示软件统一控制器（PowerPoint + WPS）。测试按钮经此调用；暂不接入手势。
 private let gPresentation = PresentationController()
 private let gSystemVolume = SystemVolumeController()
