@@ -19,6 +19,10 @@ Resources/AppIcon.icns
 # 正式交付产物：由 build.sh 重新生成，不纳入版本库（显式列出，非 *.app 通配）
 HandMark.app/
 
+# 分发打包产物：build.sh + ditto 生成，仅用于上传 GitHub Release，不纳入版本库
+HandMark-*-macos.zip
+HandMark-*-macos.dmg
+
 # ===== macOS 杂项 =====
 .DS_Store
 
