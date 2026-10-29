@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HandMark隔空笔迹 · 用你的手隔空操控屏幕</title>
+<style>
+  :root{
+    --bg:#0B0B0D;            /* 极深石墨黑，非纯黑 */
+    --surface:#161619;       /* 卡片上缘 */
+    --surface2:#0E0E10;      /* 卡片下缘 */
+    --line:rgba(255,255,255,.10);
+    --line-soft:rgba(255,255,255,.06);
+    --txt:#F5F4F0;           /* 暖白主文字 */
+    --sub:#9A9AA2;           /* 次级灰 */
+    --accent:#D7FF3F;        /* 荧光黄绿（克制高能） */
+    --accent-soft:rgba(215,255,63,.12);
+    --r:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--txt);
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'SF Pro Display','PingFang SC','Microsoft YaHei',sans-serif;
+    line-height:1.6;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  }
+  /* 隐约科技网格 + 顶部微光，制造工业/极客质感 */
+  body::before{
+    content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background-image:
+      linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);
+    background-size:46px 46px;
+    -webkit-mask-image:radial-gradient(120% 80% at 50% -10%,#000 25%,transparent 78%);
+            mask-image:radial-gradient(120% 80% at 50% -10%,#000 25%,transparent 78%);
+  }
+  body::after{
+    content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:radial-gradient(880px 480px at 82% -12%,rgba(215,255,63,.07),transparent 60%);
+  }
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 22px;position:relative}
+
+  /* ---------- 顶栏 ---------- */
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px) saturate(140%);
+    background:rgba(11,11,13,.62);border-bottom:1px solid var(--line-soft)}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:62px}
+  .logo{font-weight:800;letter-spacing:.4px;font-size:18px}
+  .logo b{color:var(--accent);font-weight:800}
+  .navlinks{display:flex;gap:30px;font-size:13.5px;color:var(--sub);letter-spacing:.3px}
+  .navlinks a{transition:color .2s;position:relative}
+  .navlinks a:hover{color:var(--txt)}
+  .navlinks a.get-cta{color:#0B0B0D;background:var(--accent);padding:7px 16px;border-radius:9px;font-weight:700;letter-spacing:.2px}
+  .navlinks a.get-cta:hover{box-shadow:0 0 0 1px var(--accent),0 8px 26px rgba(215,255,63,.28)}
+
+  /* ---------- Hero：非对称沉浸式大字压图 ---------- */
+  .hero-container{position:relative;width:100%;min-height:92vh;display:flex;align-items:center;
+    justify-content:flex-start;overflow:hidden;padding:100px 0 60px}
+  .hero-visual-bg{position:absolute;top:55%;left:55%;transform:translate(-45%,-45%) scale(1.15);
+    width:85%;max-width:1300px;z-index:1;opacity:.85;pointer-events:none;
+    -webkit-mask-image:radial-gradient(circle at 50% 50%,#000 40%,transparent 80%);
+            mask-image:radial-gradient(circle at 50% 50%,#000 40%,transparent 80%)}
+  /* 左侧/顶部暗化保护：文字 100% 可读，画面四周沉入背景 */
+  .hero-container::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+    background:radial-gradient(ellipse at 20% 40%,rgba(11,11,13,.85) 0%,rgba(11,11,13,.4) 60%,transparent 100%),
+               linear-gradient(to bottom,rgba(11,11,13,.5) 0%,transparent 25%,transparent 70%,#0B0B0D 100%)}
+  .hero-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:flex-start;
+    text-align:left;max-width:720px;margin-left:0}
+  .hero-content .badge{margin-bottom:24px}
+  .hero-content .lead{margin:0 0 6px}
+  .hero-content .manifesto{position:relative;margin:12px 0 0 0;text-align:left;max-width:540px;
+    border:1px solid var(--line-soft);border-left:2px solid var(--accent);border-radius:10px;
+    padding:14px 18px 14px 20px;background:rgba(22,22,25,.65);backdrop-filter:blur(12px)}
+  .hero-content .cta{justify-content:flex-start;margin-top:28px}
+  @media(max-width:820px){.hero-container{padding:90px 0 60px;min-height:84vh}
+    .hero-visual-bg{width:96%;left:50%;top:58%;transform:translate(-50%,-50%) scale(1.05)}}
+
+  .badge{display:inline-flex;align-items:center;gap:8px;font-size:11.5px;letter-spacing:1px;
+    color:var(--txt);border:1px solid var(--line);border-radius:999px;padding:5px 13px;
+    background:rgba(255,255,255,.03);text-transform:uppercase}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent)}
+
+  h1{font-size:clamp(52px,6.5vw,86px);line-height:1.02;margin-bottom:20px;font-weight:800;letter-spacing:-.035em;
+    text-shadow:0 4px 20px rgba(11,11,13,.95),0 12px 40px rgba(0,0,0,.9)}
+  h1 span{color:var(--accent);text-shadow:0 0 35px rgba(215,255,63,.35),0 4px 20px rgba(11,11,13,.95)}
+  .lead{color:#B0B0B8;font-size:17px;max-width:580px;margin-bottom:24px;text-shadow:0 2px 10px rgba(11,11,13,.9)}
+
+  /* 语录卡片：毛玻璃 + 左侧亮色光条，告别廉价文本框 */
+  .manifesto{position:relative;font-size:15px;line-height:1.7;color:#D8D8D2;
+    border:1px solid var(--line-soft);border-left:2px solid var(--accent);
+    border-radius:10px;padding:16px 20px 16px 22px;max-width:560px;
+    background:rgba(255,255,255,.025);backdrop-filter:blur(6px)}
+  .manifesto::before{content:"“";position:absolute;left:9px;top:-4px;color:var(--accent);
+    font-size:22px;opacity:.55;font-family:Georgia,serif}
+
+  /* CTA：微圆角矩形 + 主实色 / 次毛玻璃 */
+  .cta{margin-top:32px;display:flex;gap:14px;flex-wrap:wrap}
+  .btn{padding:12px 22px;border-radius:10px;font-weight:600;font-size:14.5px;cursor:pointer;
+    transition:transform .22s,box-shadow .22s,border-color .22s,background .22s;border:1px solid transparent;letter-spacing:.2px}
+  .btn.primary{background:var(--accent);color:#0B0B0D}
+  .btn.primary:hover{box-shadow:0 10px 32px rgba(215,255,63,.30);transform:translateY(-1px)}
+  .btn.ghost{background:rgba(255,255,255,.03);color:var(--txt);border:1px solid var(--line)}
+  .btn.ghost:hover{border-color:rgba(255,255,255,.24);background:rgba(255,255,255,.06)}
+
+  /* ---------- 区块通用 ---------- */
+  section{padding:44px 0;position:relative}
+  section+section.tight-top{padding-top:32px}
+  .sec-head{text-align:center;margin-bottom:56px}
+  .sec-head h2{font-size:clamp(28px,3.6vw,38px);font-weight:800;letter-spacing:-.02em;margin-bottom:12px}
+  .sec-head p{color:var(--sub);font-size:15.5px}
+  .kicker{font-size:12px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-bottom:12px;font-weight:600}
+
+  .grid{display:grid;gap:24px}
+  .g2{grid-template-columns:repeat(2,1fr)}
+  .g4{grid-template-columns:repeat(4,1fr)}
+  @media(max-width:820px){.g4{grid-template-columns:repeat(2,1fr)}.g2{grid-template-columns:1fr}}
+
+  /* ---------- 卡片：半透明渐变 + 1px 微边框 + hover 上浮/聚光 ---------- */
+  .card{position:relative;overflow:hidden;background:linear-gradient(160deg,var(--surface),var(--surface2));
+    border:1px solid var(--line-soft);border-radius:var(--r);padding:24px;
+    transition:transform .25s,border-color .25s,box-shadow .25s}
+  .card:hover{transform:translateY(-5px);border-color:rgba(215,255,63,.40);
+    box-shadow:0 18px 44px rgba(0,0,0,.5),0 0 0 1px rgba(215,255,63,.12)}
+  .card::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;
+    transition:opacity .3s;background:radial-gradient(420px circle at var(--mx,50%) var(--my,0%),rgba(215,255,63,.10),transparent 42%)}
+  .card:hover::after{opacity:1}
+  .card .ic{width:52px;height:52px;border-radius:13px;margin-bottom:16px;
+    display:flex;align-items:center;justify-content:center;color:var(--accent);
+    background:rgba(255,255,255,.03);border:1px solid var(--line-soft)}
+  .card .ic svg{width:28px;height:28px;display:block}
+  .card h3{font-size:16.5px;margin-bottom:8px;letter-spacing:-.01em}
+  .card p{color:var(--sub);font-size:13.5px;line-height:1.65}
+
+  /* ---------- 原理管线 ---------- */
+  .pipe{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap;justify-content:center}
+  .step{background:linear-gradient(160deg,var(--surface),var(--surface2));border:1px solid var(--line-soft);
+    border-radius:12px;padding:16px 18px;min-width:140px;text-align:center}
+  .step b{color:var(--accent);font-weight:600}
+  .step small{display:block;color:var(--sub);font-size:12px;margin-top:4px}
+  .arrow{display:flex;align-items:center;color:var(--sub);font-size:18px}
+
+  /* ---------- 体验区 ---------- */
+  .demo{background:linear-gradient(160deg,var(--surface),var(--surface2));border:1px solid var(--line-soft);border-radius:var(--r);padding:22px}
+  .demo canvas{width:100%;height:340px;display:block;background:#0A0A0C;border:1px solid var(--line-soft);
+    border-radius:12px;cursor:crosshair;touch-action:none}
+  .demo .row{display:flex;justify-content:space-between;align-items:center;margin-top:14px;flex-wrap:wrap;gap:10px}
+  .demo .hint{color:var(--sub);font-size:13px}
+  .demo .mini{font-size:13px;padding:7px 14px;border-radius:9px;border:1px solid var(--line);
+    background:transparent;color:var(--txt);cursor:pointer;transition:.2s}
+  .demo .mini:hover{border-color:var(--accent);color:var(--accent)}
+
+  /* ---------- 展示区 ---------- */
+  .gallery{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  @media(max-width:820px){.gallery{grid-template-columns:1fr}}
+  .ph{aspect-ratio:16/9;background:repeating-linear-gradient(45deg,#101013,#101013 12px,#0c0c0e 12px,#0c0c0e 24px);
+    border:1px dashed var(--line);border-radius:12px;display:flex;align-items:center;justify-content:center;
+    color:var(--sub);font-size:14px;text-align:center;padding:14px}
+  video{width:100%;border-radius:12px;border:1px solid var(--line-soft);background:#000}
+  .shot-wrap{position:relative}
+  .shot{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:12px;border:1px solid var(--line-soft);
+    display:block;box-shadow:0 14px 40px rgba(0,0,0,.45)}
+  .shot-cap{position:absolute;left:12px;bottom:12px;font-size:12px;color:#fff;background:rgba(8,8,10,.62);
+    padding:4px 10px;border-radius:8px;backdrop-filter:blur(4px)}
+
+  /* ---------- 隔空触控横幅 ---------- */
+  .band{position:relative;overflow:hidden;margin:8px 0 0;border-top:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft)}
+  .band img{width:100%;height:300px;object-fit:cover;display:block;opacity:.42}
+  .band-txt{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:0 20px}
+  .band-txt p{font-size:clamp(20px,3vw,30px);font-weight:800;letter-spacing:-.01em;color:var(--txt);
+    max-width:660px;text-shadow:0 2px 24px rgba(0,0,0,.55)}
+
+  /* ---------- 获取 ---------- */
+  .get{border:1px solid var(--line-soft);border-radius:var(--r);padding:30px;
+    background:linear-gradient(160deg,var(--surface),var(--surface2));text-align:center}
+  .get code{background:var(--accent-soft);padding:3px 9px;border-radius:7px;color:var(--accent);
+    font-size:14px;border:1px solid rgba(215,255,63,.22)}
+
+  footer{border-top:1px solid var(--line-soft);padding:38px 0;color:var(--sub);font-size:13px;text-align:center}
+  footer .ch{color:var(--accent);font-weight:700}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="logo">Hand<b>Mark</b>隔空笔迹</div>
+    <div class="navlinks">
+      <a href="#features">能力</a>
+      <a href="#how">原理</a>
+      <a href="#demo">体验</a>
+      <a href="#gallery">展示</a>
+      <a href="#get" class="get-cta">获取</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero-container">
+  <img class="hero-visual-bg" src="assets/gesture-rings.jpg" alt="隔空手势操控示意" />
+  <div class="wrap" style="width:100%;">
+    <div class="hero-content">
+      <span class="badge"><span class="dot"></span> macOS 原生 · 摄像头手势识别 · 无需穿戴</span>
+      <h1>用你的手，<br><span>隔空操控屏幕</span></h1>
+      <p class="lead">HandMark 把普通摄像头变成「空中鼠标」：捏合即画笔，指尖即激光，剪刀手翻页，握拳清屏。演讲、教学、标注，抬手就来。</p>
+      <div class="manifesto">这个 1024，我做了一个 HandMark，让每个人不必触碰屏幕，也能在空气里书写与翻页。</div>
+      <div class="cta">
+        <a class="btn primary" href="#demo">▸ 网页端先体验</a>
+        <a class="btn ghost" href="#get">如何获取</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="features">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">Core Features</div>
+      <h2>四种手势，覆盖日常演示</h2>
+      <p>所有手势在统一的状态机里协调，互不打架、不会误触。</p>
+    </div>
+    <div class="grid g4">
+      <div class="card"><div class="ic"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M248,92.68a15.86,15.86,0,0,0-4.69-11.31L174.63,12.68a16,16,0,0,0-22.63,0L123.57,41.11l-58,21.77A16.06,16.06,0,0,0,55.35,75.23L32.11,214.68A8,8,0,0,0,40,224a8.4,8.4,0,0,0,1.32-.11l139.44-23.24a16,16,0,0,0,12.35-10.17l21.77-58L243.31,104A15.87,15.87,0,0,0,248,92.68Zm-69.87,92.19L63.32,204l47.37-47.37a28,28,0,1,0-11.32-11.32L52,192.7,71.13,77.86,126,57.29,198.7,130ZM112,132a12,12,0,1,1,12,12A12,12,0,0,1,112,132Zm96-15.32L139.31,48l24-24L232,92.68Z"/></svg></div><h3>捏合 · 绘画</h3><p>拇指与食指捏合即落笔，空中书写、圈划、标注，线条经 1€ 滤波平滑。</p></div>
+      <div class="card"><div class="ic"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M221.87,83.16A104.1,104.1,0,1,1,195.67,49l22.67-22.68a8,8,0,0,1,11.32,11.32l-96,96a8,8,0,0,1-11.32-11.32l27.72-27.72a40,40,0,1,0,17.87,31.09,8,8,0,1,1,16-.9,56,56,0,1,1-22.38-41.65L184.3,60.39a87.88,87.88,0,1,0,23.13,29.67,8,8,0,0,1,14.44-6.9Z"/></svg></div><h3>指尖 · 激光</h3><p>红色光点常驻跟随食指指尖，演讲指引焦点，无需额外激光笔。</p></div>
+      <div class="card"><div class="ic"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M213.66,181.66l-32,32a8,8,0,0,1-11.32-11.32L188.69,184H48a8,8,0,0,1,0-16H188.69l-18.35-18.34a8,8,0,0,1,11.32-11.32l32,32A8,8,0,0,1,213.66,181.66Zm-139.32-64a8,8,0,0,0,11.32-11.32L67.31,88H208a8,8,0,0,0,0-16H67.31L85.66,53.66A8,8,0,0,0,74.34,42.34l-32,32a8,8,0,0,0,0,11.32Z"/></svg></div><h3>剪刀手 · 翻页</h3><p>食指+中指伸出（剪刀手）水平挥动即翻页，适配 PPT / WPS / PDF 放映。</p></div>
+      <div class="card"><div class="ic"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M225,80.4,183.6,39a24,24,0,0,0-33.94,0L31,157.66a24,24,0,0,0,0,33.94l30.06,30.06A8,8,0,0,0,66.74,224H216a8,8,0,0,0,0-16h-84.7L225,114.34A24,24,0,0,0,225,80.4ZM108.68,208H70.05L42.33,180.28a8,8,0,0,1,0-11.31L96,115.31,148.69,168Zm105-105L160,156.69,107.31,104,161,50.34a8,8,0,0,1,11.32,0l41.38,41.38a8,8,0,0,1,0,11.31Z"/></svg></div><h3>握拳 · 清屏</h3><p>五指收拢成拳一键清屏，快速进入下一段讲解。</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="scenes" style="padding-top:32px">
+  <div class="wrap">
+    <div class="grid g4">
+      <div class="card"><div class="ic"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M216,40H136V24a8,8,0,0,0-16,0V40H40A16,16,0,0,0,24,56V176a16,16,0,0,0,16,16H79.36L57.75,219a8,8,0,0,0,12.5,10l29.59-37h56.32l29.59,37a8,8,0,1,0,12.5-10l-21.61-27H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,136H40V56H216V176Z"/></svg></div><h3>演讲翻页</h3><p>站在台上来回走，手一挥就翻页，目光不必回到键盘。</p></div>
+      <div class="card"><div class="ic"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H53.39a8,8,0,0,0,7.23-4.57,48,48,0,0,1,86.76,0,8,8,0,0,0,7.23,4.57H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM80,144a24,24,0,1,1,24,24A24,24,0,0,1,80,144Zm136,56H159.43a64.39,64.39,0,0,0-28.83-26.16,40,40,0,1,0-53.2,0A64.39,64.39,0,0,0,48.57,200H40V56H216ZM56,96V80a8,8,0,0,1,8-8H192a8,8,0,0,1,8,8v96a8,8,0,0,1-8,8H176a8,8,0,0,1,0-16h8V88H72v8a8,8,0,0,1-16,0Z"/></svg></div><h3>教学标注</h3><p>屏幕即黑板，圈重点、画流程，讲解更直观。</p></div>
+      <div class="card"><div class="ic"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M232,32a8,8,0,0,0-8-8c-44.08,0-89.31,49.71-114.43,82.63A60,60,0,0,0,32,164c0,30.88-19.54,44.73-20.47,45.37A8,8,0,0,0,16,224H92a60,60,0,0,0,57.37-77.57C182.3,121.31,232,76.08,232,32ZM92,208H34.63C41.38,198.41,48,183.92,48,164a44,44,0,1,1,44,44Zm32.42-94.45q5.14-6.66,10.09-12.55A76.23,76.23,0,0,1,155,121.49q-5.9,4.94-12.55,10.09A60.54,60.54,0,0,0,124.42,113.55Zm42.7-2.68a92.57,92.57,0,0,0-22-22c31.78-34.53,55.75-45,69.9-47.91C212.17,55.12,201.65,79.09,167.12,110.87Z"/></svg></div><h3>屏幕绘画</h3><p>临时草图、思维导图，随手就画，随时清屏。</p></div>
+      <div class="card"><div class="ic"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M251.77,73a8,8,0,0,0-8.21.39L208,97.05V72a16,16,0,0,0-16-16H32A16,16,0,0,0,16,72V184a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V159l35.56,23.71A8,8,0,0,0,248,184a8,8,0,0,0,8-8V80A8,8,0,0,0,251.77,73ZM192,184H32V72H192V184Zm48-22.95-32-21.33V116.28L240,95Z"/></svg></div><h3>远程演示</h3><p>视频会议中隔空指向与标注，对方看得更清楚。</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">How It Works</div>
+      <h2>从手部到笔迹，一帧之内</h2>
+      <p>纯本地实时管线，无云端往返，低延迟。</p>
+    </div>
+    <div class="pipe">
+      <div class="step"><b>摄像头</b><small>采集手部画面</small></div>
+      <div class="arrow">→</div>
+      <div class="step"><b>关键点</b><small>Vision 手部 21 点</small></div>
+      <div class="arrow">→</div>
+      <div class="step"><b>手势分类</b><small>curl / ratio 判定</small></div>
+      <div class="arrow">→</div>
+      <div class="step"><b>状态机</b><small>优先级协调防误触</small></div>
+      <div class="arrow">→</div>
+      <div class="step"><b>1€ 滤波</b><small>平滑笔迹</small></div>
+      <div class="arrow">→</div>
+      <div class="step"><b>指针 / 笔迹</b><small>屏幕输出</small></div>
+    </div>
+  </div>
+</section>
+
+<section id="tech" style="padding-top:64px">
+  <div class="wrap">
+    <div class="sec-head"><h2>技术亮点</h2><p>为了解决「画不直、翻不稳」，我们做了这些事。</p></div>
+    <div class="grid g2">
+      <div class="card"><div class="ic"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M56,96v64a8,8,0,0,1-16,0V96a8,8,0,0,1,16,0ZM88,24a8,8,0,0,0-8,8V224a8,8,0,0,0,16,0V32A8,8,0,0,0,88,24Zm40,32a8,8,0,0,0-8,8V192a8,8,0,0,0,16,0V64A8,8,0,0,0,128,56Zm40,32a8,8,0,0,0-8,8v64a8,8,0,0,0,16,0V96A8,8,0,0,0,168,88Zm40-16a8,8,0,0,0-8,8v96a8,8,0,0,0,16,0V80A8,8,0,0,0,208,72Z"/></svg></div><h3>① 1€ 滤波调优</h3><p>降低最小截止频率并修复重锚跳变，捏合绘画的直线抖动显著下降，移动跟手度不受影响。</p></div>
+      <div class="card"><div class="ic"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M64,105V40a8,8,0,0,0-16,0v65a32,32,0,0,0,0,62v49a8,8,0,0,0,16,0V167a32,32,0,0,0,0-62Zm-8,47a16,16,0,1,1,16-16A16,16,0,0,1,56,152Zm80-95V40a8,8,0,0,0-16,0V57a32,32,0,0,0,0,62v97a8,8,0,0,0,16,0V119a32,32,0,0,0,0-62Zm-8,47a16,16,0,1,1,16-16A16,16,0,0,1,128,104Zm104,64a32.06,32.06,0,0,0-24-31V40a8,8,0,0,0-16,0v97a32,32,0,0,0,0,62v17a8,8,0,0,0,16,0V199A32.06,32.06,0,0,0,232,168Zm-32,16a16,16,0,1,1,16-16A16,16,0,0,1,200,184Z"/></svg></div><h3>② 翻页临界去抖</h3><p>为中指设置独立阈值、进入侧 350ms 连续丢失容忍，剪刀手在临界 curl 值附近不再频繁命中/掉线。</p></div>
+      <div class="card"><div class="ic"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M232,64a32,32,0,1,0-40,31v17a8,8,0,0,1-8,8H96a23.84,23.84,0,0,0-8,1.38V95a32,32,0,1,0-16,0v66a32,32,0,1,0,16,0V144a8,8,0,0,1,8-8h88a24,24,0,0,0,24-24V95A32.06,32.06,0,0,0,232,64ZM64,64A16,16,0,1,1,80,80,16,16,0,0,1,64,64ZM96,192a16,16,0,1,1-16-16A16,16,0,0,1,96,192ZM200,80a16,16,0,1,1,16-16A16,16,0,0,1,200,80Z"/></svg></div><h3>③ 手势优先级协调</h3><p>绘画 / 翻页 / 清屏由统一协调器仲裁，翻页期间自动挂起捏合并隐藏激光，互不打架。</p></div>
+      <div class="card"><div class="ic"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M207.06,72.67A111.24,111.24,0,0,0,128,40h-.4C66.07,40.21,16,91,16,153.13V176a16,16,0,0,0,16,16H224a16,16,0,0,0,16-16V152A111.25,111.25,0,0,0,207.06,72.67ZM224,176H119.71l54.76-75.3a8,8,0,0,0-12.94-9.42L99.92,176H32V153.13c0-3.08.15-6.12.43-9.13H56a8,8,0,0,0,0-16H35.27c10.32-38.86,44-68.24,84.73-71.66V80a8,8,0,0,0,16,0V56.33A96.14,96.14,0,0,1,221,128H200a8,8,0,0,0,0,16h23.67c.21,2.65.33,5.31.33,8Z"/></svg></div><h3>④ macOS 原生低延迟</h3><p>Swift 原生实现，事件直达系统，无需浏览器插件或外部服务。</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="band">
+  <img src="assets/holo-arm.jpg" alt="隔空触控" />
+  <div class="band-txt"><p>无需触碰，指尖即指令。</p></div>
+</section>
+
+<section id="demo">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">Try It</div>
+      <h2>网页端体验「绘画手感」</h2>
+      <p>虽然完整手势识别在 macOS 客户端，但你可以在这里先感受「落笔—平滑—清屏」的交互。</p>
+    </div>
+    <div class="demo">
+      <canvas id="pad"></canvas>
+      <div class="row">
+        <span class="hint">按住鼠标拖动即可书写；松手保留笔迹，点「清屏」重来。</span>
+        <button class="mini" id="clear">清屏 ✊</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="gallery">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">Showcase</div>
+      <h2>作品展示</h2>
+      <p>下方为产品概念示意与真实使用场景，演示录屏区待替换为实拍 mp4。</p>
+    </div>
+    <div class="gallery">
+      <div class="shot-wrap"><img class="shot" src="assets/draw-screen.jpg" alt="捏合绘画示意" /><span class="shot-cap">捏合绘画 · 概念示意</span></div>
+      <div class="shot-wrap"><img class="shot" src="assets/live-event.jpg" alt="演讲翻页真实场景" /><span class="shot-cap">演讲翻页 · 真实场景</span></div>
+    </div>
+    <div style="margin-top:18px">
+      <div class="ph" style="aspect-ratio:16/9">🎬 在此放置：客户端演示录屏（mp4）<br>替换本区块为 &lt;video&gt; 并指向 assets/demo.mp4</div>
+    </div>
+  </div>
+</section>
+
+<section id="get">
+  <div class="wrap">
+    <div class="sec-head"><h2>如何获取 HandMark</h2></div>
+    <div class="get">
+      <p style="color:var(--sub);margin-bottom:14px">HandMark 当前以 <b style="color:var(--txt)">GitHub Release</b> 形式分发 macOS 原生应用，开箱即用、纯本地运行。</p>
+      <p>在仓库 Releases 页下载 <code>HandMark.app</code> 即可体验全部手势。</p>
+      <p style="color:var(--sub);font-size:13px;margin-top:12px">（具体下载地址与版本说明以作者发布页为准；本页为 1024 造物挑战参赛展示页。）</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p><span class="ch">HandMark隔空笔迹</span> · 1024 造物挑战参赛作品 · 用 WorkBuddy 创作并发布</p>
+    <p style="margin-top:6px;opacity:.7">摄像头手势识别 · 隔空绘画与翻页 · macOS 原生</p>
+  </div>
+</footer>
+
+<script>
+  // 卡片聚光效果：鼠标位置驱动径向高光
+  document.querySelectorAll('.card').forEach(c=>{
+    c.addEventListener('mousemove',e=>{
+      const r=c.getBoundingClientRect();
+      c.style.setProperty('--mx',((e.clientX-r.left)/r.width*100)+'%');
+      c.style.setProperty('--my',((e.clientY-r.top)/r.height*100)+'%');
+    });
+  });
+
+  const cv = document.getElementById('pad');
+  const ctx = cv.getContext('2d');
+  function fit(){ const r=cv.getBoundingClientRect(); cv.width=r.width*devicePixelRatio; cv.height=r.height*devicePixelRatio;
+    ctx.scale(devicePixelRatio,devicePixelRatio); ctx.lineCap='round'; ctx.lineJoin='round';
+    ctx.strokeStyle='#D7FF3F'; ctx.lineWidth=3; }
+  fit(); window.addEventListener('resize',()=>{fit();});
+  let drawing=false, last=null;
+  function pos(e){ const r=cv.getBoundingClientRect(); const p=e.touches?e.touches[0]:e; return {x:p.clientX-r.left,y:p.clientY-r.top}; }
+  function start(e){ drawing=true; last=pos(e); e.preventDefault(); }
+  function move(e){ if(!drawing) return; const p=pos(e);
+    ctx.beginPath(); ctx.moveTo(last.x,last.y); ctx.lineTo(p.x,p.y); ctx.stroke(); last=p; e.preventDefault(); }
+  function end(){ drawing=false; }
+  cv.addEventListener('mousedown',start); cv.addEventListener('mousemove',move); window.addEventListener('mouseup',end);
+  cv.addEventListener('touchstart',start); cv.addEventListener('touchmove',move); cv.addEventListener('touchend',end);
+  document.getElementById('clear').addEventListener('click',()=>{ ctx.clearRect(0,0,cv.width,cv.height); });
+</script>
+</body>
+</html>

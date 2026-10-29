@@ -24,3 +24,10 @@ HandMark.app/
 
 # ===== WorkBuddy 项目数据（非源码，不纳入版本库）=====
 .workbuddy/
+
+# ===== Xcode 工程工作区（用户级，不纳入版本库）=====
+HandMark.xcodeproj/project.xcworkspace/
+
+# ===== WorkBuddy 发布标记文件（内部，不纳入版本库）=====
+.wbapp*.genie
+
