@@ -24,7 +24,9 @@
 import Foundation
 import AppKit
 import CoreGraphics
+#if canImport(HandMarkCore)
 import HandMarkCore
+#endif
 
 // MARK: - 统一结果状态
 
@@ -259,6 +261,12 @@ final class PresentationController {
     private let powerPoint = PowerPointAdapter()
     private let wps = WPSAdapter()
     private var adapters: [PresentationAdapter] { [powerPoint, wps] }
+
+    /// 发送合成键盘事件（向 WPS / PowerPoint 定向投递）所需的权限，只读探测、不弹窗。
+    /// 对应「系统设置 > 隐私与安全性 > 辅助功能」，与 WPSAdapter 实际翻页所依赖的
+    /// `CGPreflightPostEventAccess()` 语义一致（区别于另一类别的 AXIsProcessTrusted）。
+    /// 供启动日志 / UI 提示统一引用，替代已移除的 PageFlipper 探针。
+    var hasPostEventAccess: Bool { CGPreflightPostEventAccess() }
 
     /// 发现当前运行中的目标，并打印诊断（名称/bundleId/pid/前台）。
     @discardableResult

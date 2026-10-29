@@ -144,4 +144,19 @@ public final class DrawState {
         lock.lock(); defer { lock.unlock() }
         return pinching
     }
+
+    /// 双指翻页手势当前是否处于「激活」态（armed / cooldown / waitReset 任一，即非 idle）。
+    ///
+    /// 供激光点绘制使用：翻页手势识别与执行期间隐藏红色激光点，结束后（回到 idle）自动恢复。
+    /// 与 finger / pinching 同为「激光显隐输入」，经同一 NSLock 保护，后台写入、主线程读取。
+    private var pageFlipActive = false
+
+    public func setPageFlipActive(_ value: Bool) {
+        lock.lock(); pageFlipActive = value; lock.unlock()
+    }
+
+    public func isPageFlipActive() -> Bool {
+        lock.lock(); defer { lock.unlock() }
+        return pageFlipActive
+    }
 }

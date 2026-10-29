@@ -20,16 +20,23 @@ def oid(key: str) -> str:
     return hashlib.sha1(key.encode("utf-8")).hexdigest()[:24].upper()
 
 
-APP_SOURCES = [
-    "Sources/HandMark/main.swift",
-    "Sources/HandMark/SystemVolumeController.swift",
-]
+APP_DIR = "Sources/HandMark"
+# 动态枚举主 target 的全部 Swift 源文件：新增 .swift 自动进入 Xcode 工程，无需手动维护清单。
+APP_SOURCES = sorted(
+    os.path.join(APP_DIR, f) for f in os.listdir(os.path.join(ROOT, APP_DIR))
+    if f.endswith(".swift")
+)
 CORE_DIR = "Sources/HandMarkCore"
 CORE_SOURCES = sorted(
     os.path.join(CORE_DIR, f) for f in os.listdir(os.path.join(ROOT, CORE_DIR))
     if f.endswith(".swift")
 )
-RESOURCES = ["Resources/AppIcon.icns"]
+# 应用图标（静态 icns，暂不统一源） + 菜单栏深色/浅色图标（按系统外观切换）。
+RESOURCES = [
+    "Resources/AppIcon.icns",
+    "assets/menubar/MenuBarIconDark.png",
+    "assets/menubar/MenuBarIconLight.png",
+]
 
 PROJECT = oid("PBXProject")
 TARGET = oid("PBXNativeTarget")
@@ -85,7 +92,8 @@ for p in APP_SOURCES + CORE_SOURCES:
 
 res_build_files = []
 for p in RESOURCES:
-    fid, bid = file_ref(p, "image.icns", "Resources", ref_path=p)
+    kind = "image.png" if p.lower().endswith(".png") else "image.icns"
+    fid, bid = file_ref(p, kind, "Resources", ref_path=p)
     res_build_files.append(bid)
 
 w("/* End PBXBuildFile section */")
@@ -100,8 +108,8 @@ for fid, path, kind, name in build_files:
       % (fid, name, kind, path))
 w("\t\t%s /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = \"<group>\"; };"
   % oid("file Info.plist"))
-w("\t\t%s /* HandMark.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = HandMark.entitlements; sourceTree = \"<group>\"; };"
-  % oid("file HandMark.entitlements"))
+w("\t\t%s /* HandMark-Direct.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = HandMark-Direct.entitlements; sourceTree = \"<group>\"; };"
+  % oid("file HandMark-Direct.entitlements"))
 w("\t\t%s /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };"
   % COREAUDIO_REF)
 w("/* End PBXFileReference section */")
@@ -126,7 +134,7 @@ w("\t\t%s = {" % MAIN_GROUP)
 w("\t\t\tisa = PBXGroup;")
 w("\t\t\tchildren = (")
 w("\t\t\t\t%s /* Info.plist */," % oid("file Info.plist"))
-w("\t\t\t\t%s /* HandMark.entitlements */," % oid("file HandMark.entitlements"))
+w("\t\t\t\t%s /* HandMark-Direct.entitlements */," % oid("file HandMark-Direct.entitlements"))
 w("\t\t\t\t%s /* HandMark */," % APP_GROUP)
 w("\t\t\t\t%s /* HandMarkCore */," % CORE_GROUP)
 w("\t\t\t\t%s /* Resources */," % RES_GROUP)
@@ -290,13 +298,13 @@ COMMON_PROJECT = [
 COMMON_TARGET = [
     ("ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS", "YES"),
     ("CLANG_ENABLE_MODULES", "YES"),
-    ("CODE_SIGN_ENTITLEMENTS", "HandMark.entitlements"),
+    ("CODE_SIGN_ENTITLEMENTS", "HandMark-Direct.entitlements"),
     ("CODE_SIGN_STYLE", "Automatic"),
     ("COMBINE_HIDPI_IMAGES", "YES"),
     ("CURRENT_PROJECT_VERSION", "1"),
-    ("DEVELOPMENT_TEAM", "HG3Y3TSXQT"),
+    ("DEVELOPMENT_TEAM", "wangguangzheng"),
     ("ENABLE_HARDENED_RUNTIME", "YES"),
-    ("ENABLE_APP_SANDBOX", "YES"),
+    ("ENABLE_APP_SANDBOX", "NO"),
     ("GENERATE_INFOPLIST_FILE", "NO"),
     ("INFOPLIST_FILE", "Info.plist"),
     ("LD_RUNPATH_SEARCH_PATHS", "\"$(inherited) @executable_path/../Frameworks\""),
@@ -343,7 +351,7 @@ emit_config(TARGET_DEBUG, "Debug", COMMON_TARGET, [
     ("SWIFT_ACTIVE_COMPILATION_CONDITIONS", "\"$(inherited) DEBUG\""),
 ])
 emit_config(TARGET_RELEASE, "Release", COMMON_TARGET, [
-    ("CODE_SIGN_IDENTITY", "\"Apple Distribution\""),
+    ("CODE_SIGN_IDENTITY", "\"Developer ID Application\""),
 ])
 w("/* End XCBuildConfiguration section */")
 w("")

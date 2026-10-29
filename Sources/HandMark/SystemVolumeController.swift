@@ -1,6 +1,8 @@
 import Foundation
 import CoreAudio
+#if canImport(HandMarkCore)
 import HandMarkCore
+#endif
 
 /// 公开 Core Audio API 的系统输出音量控制器。
 /// 每次操作都重新解析默认输出设备，因此耳机/扬声器切换后不会继续写旧设备。

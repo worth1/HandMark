@@ -4,7 +4,9 @@ import AppKit
 import AVFoundation
 import Vision
 import Security
+#if canImport(HandMarkCore)
 import HandMarkCore
+#endif
 
 // MARK: - 版本信息（取自 Info.plist，随打包写入）
 let appVersionText: String = {
@@ -367,14 +369,15 @@ final class OverlayView: NSView {
 
         CATransaction.begin()
         CATransaction.setDisableActions(true)
-        if let f = state.fingerSnapshot(), !state.isPinching() {
-            // 看到食指指尖且未在捏合绘画 → 显示激光式红色光点。
+        if let f = state.fingerSnapshot(), !state.isPinching(), !state.isPageFlipActive() {
+            // 看到食指指尖、未在捏合绘画、且未在双指翻页手势中 → 显示激光式红色光点。
             laserHaloLayer.isHidden = false
             laserCoreLayer.isHidden = false
             laserHotLayer.isHidden = false
             layoutPointer(at: f, drawing: false)
         } else {
-            // 手部丢失，或正在捏合绘画 → 隐藏激光点，避免与笔迹/落笔同时显示（用户要求）。
+            // 手部丢失、正在捏合绘画、或双指翻页手势激活中 → 隐藏激光点。
+            // 翻页期间隐藏可避免红色光点与翻页动作相互干扰；翻页结束回到 idle 后自动恢复。
             laserHaloLayer.isHidden = true
             laserCoreLayer.isHidden = true
             laserHotLayer.isHidden = true
@@ -1372,11 +1375,8 @@ final class ROIStore {
 // 必须持有强引用：AVCaptureVideoDataOutput 的 delegate 是 weak，且 Timer 用到了 self
 private var gTracker: HandTracker?
 private var gPanelActions: PanelActions?
-// V2.0：透明覆盖层（激光光点绘制）与翻页键盘事件发送器的全局引用。
+// V2.0：透明覆盖层（激光光点绘制）的全局引用。
 private weak var gOverlay: OverlayView?
-private let gPageFlipper = PageFlipper()
-// PPT 翻页默认机制：AppleScript 控制「正在放映」的 PowerPoint（不依赖键盘焦点、不切前台窗口）。
-// CGEvent（gPageFlipper）暂时保留，但默认关闭自动回退：权限/放映/脚本错误各自返回并记录，不静默兜底。
 // 双演示软件统一控制器（PowerPoint + WPS）。测试按钮经此调用；暂不接入手势。
 private let gPresentation = PresentationController()
 private let gSystemVolume = SystemVolumeController()
@@ -1393,38 +1393,8 @@ let DEV_PPT_TEST_BUTTONS = false
 // 需要实机标定时临时改回 true 即可，数据链路本身不受影响。
 let SHOW_DEBUG_HUD = false
 
-// MARK: - PPT 翻页：系统方向键事件发送器（CGEvent）
-// 向当前前台演示应用发送 ← / → 方向键。需「辅助功能」权限；无权限时不假装成功，只记录失败。
-final class PageFlipper {
-    /// 左方向键 keycode = 123，右方向键 = 124（macOS 虚拟键码）。
-    private let leftKey: CGKeyCode = 123
-    private let rightKey: CGKeyCode = 124
-
-    /// 当前是否具备发送按键事件所需的辅助功能权限（只读，不弹窗）。
-    var hasAccessibilityPermission: Bool {
-        AXIsProcessTrusted()
-    }
-
-    /// 发送一次方向键（按下+抬起）。返回是否成功发送（无权限或事件创建失败则 false）。
-    @discardableResult
-    func flip(_ direction: PageDirection) -> Bool {
-        guard hasAccessibilityPermission else {
-            log("⚠️ 翻页失败：缺少辅助功能权限（系统设置 > 隐私与安全性 > 辅助功能，勾选 HandMark）")
-            return false
-        }
-        let key = (direction == .left) ? leftKey : rightKey
-        let src = CGEventSource(stateID: .combinedSessionState)
-        guard let down = CGEvent(keyboardEventSource: src, virtualKey: key, keyDown: true),
-              let up = CGEvent(keyboardEventSource: src, virtualKey: key, keyDown: false) else {
-            log("⚠️ 翻页失败：无法创建键盘事件")
-            return false
-        }
-        down.post(tap: .cghidEventTap)
-        up.post(tap: .cghidEventTap)
-        log("⌨️ 翻页：\(direction == .left ? "← 上一页" : "→ 下一页")（事件已发送）")
-        return true
-    }
-}
+// （PageFlipper 已移除：翻页统一走 PresentationController → WPSAdapter → PowerPointController，
+//  权限探针改用 gPresentation.hasPostEventAccess，语义与 CGPreflightPostEventAccess 一致。）
 
 final class HandTracker: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
     private let state: DrawState
@@ -1836,9 +1806,9 @@ extension HandTracker {
                          self.trackingSealCount, self.filterResetCount)
                 + String(format: "帧抖动[原始%.2f→滤波%.2f px/帧] ", self.lastFrameJitterRaw,
                          self.lastFrameJitterFiltered)
-                + String(format: "静止窗口=%d 平均漂移=%.1fpx 最大=%.1fpx ",
-                         self.staticWindowCount,
-                         self.staticWindowCount > 0 ? self.staticDriftSum / Double(self.staticWindowCount) : 0,
+                + String(format: "静止窗口=%lld 平均漂移=%.1fpx 最大=%.1fpx ",
+                         Int64(self.staticWindowCount),
+                         self.staticWindowCount > 0 ? self.staticDriftSum / Double(self.staticWindowCount) : 0.0,
                          self.staticDriftMax)
                 + "指尖屏幕坐标=(\(Int(self.lastTip.x)), \(Int(self.lastTip.y))) "
                 + "预览窗口=\(gPreview?.isVisible == true ? "显示" : "隐藏") "
@@ -2096,6 +2066,8 @@ extension HandTracker {
                                         now: now, config: config)
         // 翻页手势识别态变化日志（实机标定用：确认「双指手形」是否被识别、以及翻页冷却）。
         let pagePhaseNow = coordinator.page.phase
+        // 翻页激活态（非 idle）写入共享状态：激光点在翻页手势期间据此隐藏，结束后自动恢复。
+        self.state.setPageFlipActive(pagePhaseNow != .idle)
         if pagePhaseNow != lastPagePhase {
             switch pagePhaseNow {
             case .armed:    log("✌️ 已识别双指翻页手形（开始跟踪挥动，请水平挥动）")
@@ -2393,6 +2365,8 @@ extension HandTracker {
                                         midTip: .zero, hasMidTip: false,
                                         refPoint: .zero, hasRef: false,
                                         now: now, config: config)
+        // 手部丢失：翻页状态机应复位到 idle，激光点恢复显示条件（无有效食指时本就不显示）。
+        self.state.setPageFlipActive(coordinator.page.phase != .idle)
         if decision.pinchOutcome == .end {
             let tail = lastWritten.flatMap { lw in prevWritten.map { hypot(lw.x - $0.x, lw.y - $0.y) } } ?? 0
             log("⏹ 手部关键点丢失，立即结束笔画（笔画数=\(state.strokesSnapshot().count)，"
@@ -2662,7 +2636,7 @@ log("窗口内可清除笔迹/隐藏预览，菜单栏可显示/退出")
 logPermissionAndIdentityDiagnostics()
 
 // V2.0：翻页依赖系统方向键事件，需「辅助功能」权限。启动时提示当前状态（不弹窗、不假装成功）。
-if gPageFlipper.hasAccessibilityPermission {
+if gPresentation.hasPostEventAccess {
     log("✅ 辅助功能权限已授予，PPT 翻页可用")
 } else {
     log("⚠️ 未获辅助功能权限：翻页手势会识别但无法发送方向键。")

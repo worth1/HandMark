@@ -25,7 +25,9 @@
 
 import Foundation
 import AppKit
+#if canImport(HandMarkCore)
 import HandMarkCore
+#endif
 
 /// PowerPoint 当前可控状态 / 一次翻页调用的结果。
 enum PPTControlResult: Equatable {

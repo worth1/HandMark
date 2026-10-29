@@ -429,7 +429,7 @@ public struct PageConfig {
     public var holdMs: Double
     /// 挥动轨迹观察窗口（毫秒）：armed 后在此窗口内累计水平位移。
     public var swipeWindowMs: Double
-    /// 水平位移阈值（归一化：相对画面宽度的比例，0.12 = 12%）。
+    /// 水平位移阈值（归一化：相对画面宽度的比例，0.10 = 10%）。
     public var horizontalThreshold: Double
     /// 翻页后冷却时长（毫秒）。
     public var cooldownMs: Double
@@ -450,10 +450,10 @@ public struct PageConfig {
 
     public init(holdMs: Double = 100,
                 swipeWindowMs: Double = 400,
-                horizontalThreshold: Double = 0.12,
+                horizontalThreshold: Double = 0.10,
                 cooldownMs: Double = 600,
                 verticalRejectRatio: Double = 1.0,
-                poseLossToleranceMs: Double = 150,
+                poseLossToleranceMs: Double = 350,
                 holdTraceMaxMs: Double = 200) {
         self.holdMs = holdMs
         self.swipeWindowMs = swipeWindowMs

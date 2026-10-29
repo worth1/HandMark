@@ -7,45 +7,52 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		48E64A2907A7498D225B64D4 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 437DA3B25ECB5DC4150A4A93 /* main.swift */; };
-		CD7BD74B4B37584F82E15567 /* SystemVolumeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90DE9F0A8E42345FD37CD738 /* SystemVolumeController.swift */; };
-		5CD9B14389D9C3BF063E7370 /* BrushModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2C7CF46A0DDFE6C8359F4D8 /* BrushModel.swift */; };
-		BD15D6E68137C003848F9415 /* ClearGestureStateMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 789F66D0E49CD242FE1A8C27 /* ClearGestureStateMachine.swift */; };
-		B1C153C3E70BC93ABFA23551 /* DrawState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B37A4A98941B58568F3EAD5 /* DrawState.swift */; };
-		6FBEBC1AA0F2D33C7F0458B1 /* Gesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 324B5CB4370FDF75CD3AB7F6 /* Gesture.swift */; };
-		FEBB1999694E759454EC207A /* GesturePriorityCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1826C13F1B932B4F75C2C41 /* GesturePriorityCoordinator.swift */; };
-		34D38EABE18F08D73B0211E1 /* KnobGestureStateMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD2139E336ABDD374651334 /* KnobGestureStateMachine.swift */; };
+		01E02204ED7F2B5A3EA8D9B0 /* Resources/AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 52AA851C3B07394F43835BDE /* Resources/AppIcon.icns */; };
 		297EA38741CE344D03C7C939 /* LaserStateMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 433158F3CC12FD7CB44AE83E /* LaserStateMachine.swift */; };
+		34D38EABE18F08D73B0211E1 /* KnobGestureStateMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD2139E336ABDD374651334 /* KnobGestureStateMachine.swift */; };
 		3FD896EF73CA4EBE39E3351F /* Metrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 978D249D29D6BB64CEC707A7 /* Metrics.swift */; };
+		450DC5A7E239C5C7944FFB2F /* assets/menubar/MenuBarIconDark.png in Resources */ = {isa = PBXBuildFile; fileRef = E33E46C5D3DEF68AAE43A70A /* assets/menubar/MenuBarIconDark.png */; };
+		48E64A2907A7498D225B64D4 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 437DA3B25ECB5DC4150A4A93 /* main.swift */; };
+		5177386D3977286A55613DA5 /* PointerMapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A23B39DDD0DF7EA3C86AA3E /* PointerMapping.swift */; };
+		5CD9B14389D9C3BF063E7370 /* BrushModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2C7CF46A0DDFE6C8359F4D8 /* BrushModel.swift */; };
+		6FBEBC1AA0F2D33C7F0458B1 /* Gesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 324B5CB4370FDF75CD3AB7F6 /* Gesture.swift */; };
+		78CE61566FA5DBE953C88384 /* PoseClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4293815F885DE9144E20AD9D /* PoseClassifier.swift */; };
+		976F6DB2C2C1399F216D0B95 /* assets/menubar/MenuBarIconLight.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C411E96A708DFF7AEC54E2B /* assets/menubar/MenuBarIconLight.png */; };
+		98517CBF31371907C3103B53 /* PowerPointController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE348DD2272B030F0964DF17 /* PowerPointController.swift */; };
+		9E79B8D088D55BBD05E7BD83 /* PresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD5FAFF94E46B68C0FDA9ED /* PresentationController.swift */; };
+		B1C153C3E70BC93ABFA23551 /* DrawState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B37A4A98941B58568F3EAD5 /* DrawState.swift */; };
+		BD15D6E68137C003848F9415 /* ClearGestureStateMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 789F66D0E49CD242FE1A8C27 /* ClearGestureStateMachine.swift */; };
+		C64762FB2D848F0FD450C981 /* VolumeGestureStateMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5006E53AF133C795BCDD126 /* VolumeGestureStateMachine.swift */; };
+		CD7BD74B4B37584F82E15567 /* SystemVolumeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90DE9F0A8E42345FD37CD738 /* SystemVolumeController.swift */; };
 		D1691DB136FECA3719765BF1 /* OneEuroFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F1B14A133FBD9D8FF32DFC /* OneEuroFilter.swift */; };
 		D21929337EB43B83485DB188 /* PageSwipeStateMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFB6C55D2A9E6DE72955AFA /* PageSwipeStateMachine.swift */; };
-		5177386D3977286A55613DA5 /* PointerMapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A23B39DDD0DF7EA3C86AA3E /* PointerMapping.swift */; };
-		78CE61566FA5DBE953C88384 /* PoseClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4293815F885DE9144E20AD9D /* PoseClassifier.swift */; };
-		C64762FB2D848F0FD450C981 /* VolumeGestureStateMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5006E53AF133C795BCDD126 /* VolumeGestureStateMachine.swift */; };
-		01E02204ED7F2B5A3EA8D9B0 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 52AA851C3B07394F43835BDE /* AppIcon.icns */; };
+		FEBB1999694E759454EC207A /* GesturePriorityCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1826C13F1B932B4F75C2C41 /* GesturePriorityCoordinator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		7823E65A39D2C6A4E759AE5C /* HandMark.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HandMark.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0A23B39DDD0DF7EA3C86AA3E /* PointerMapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PointerMapping.swift; sourceTree = "<group>"; };
+		14E28F4F3BA200FCA50B1010 /* HandMark-Direct.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "HandMark-Direct.entitlements"; sourceTree = "<group>"; };
+		1C411E96A708DFF7AEC54E2B /* assets/menubar/MenuBarIconLight.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = assets/menubar/MenuBarIconLight.png; sourceTree = "<group>"; };
+		324B5CB4370FDF75CD3AB7F6 /* Gesture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gesture.swift; sourceTree = "<group>"; };
+		4293815F885DE9144E20AD9D /* PoseClassifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseClassifier.swift; sourceTree = "<group>"; };
+		433158F3CC12FD7CB44AE83E /* LaserStateMachine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaserStateMachine.swift; sourceTree = "<group>"; };
 		437DA3B25ECB5DC4150A4A93 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
-		90DE9F0A8E42345FD37CD738 /* SystemVolumeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemVolumeController.swift; sourceTree = "<group>"; };
-		A2C7CF46A0DDFE6C8359F4D8 /* BrushModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrushModel.swift; sourceTree = "<group>"; };
+		52AA851C3B07394F43835BDE /* Resources/AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Resources/AppIcon.icns; sourceTree = "<group>"; };
+		5BD2139E336ABDD374651334 /* KnobGestureStateMachine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnobGestureStateMachine.swift; sourceTree = "<group>"; };
+		7823E65A39D2C6A4E759AE5C /* HandMark.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HandMark.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		789F66D0E49CD242FE1A8C27 /* ClearGestureStateMachine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearGestureStateMachine.swift; sourceTree = "<group>"; };
 		8B37A4A98941B58568F3EAD5 /* DrawState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawState.swift; sourceTree = "<group>"; };
-		324B5CB4370FDF75CD3AB7F6 /* Gesture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gesture.swift; sourceTree = "<group>"; };
-		C1826C13F1B932B4F75C2C41 /* GesturePriorityCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GesturePriorityCoordinator.swift; sourceTree = "<group>"; };
-		5BD2139E336ABDD374651334 /* KnobGestureStateMachine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnobGestureStateMachine.swift; sourceTree = "<group>"; };
-		433158F3CC12FD7CB44AE83E /* LaserStateMachine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaserStateMachine.swift; sourceTree = "<group>"; };
+		90DE9F0A8E42345FD37CD738 /* SystemVolumeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemVolumeController.swift; sourceTree = "<group>"; };
 		978D249D29D6BB64CEC707A7 /* Metrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Metrics.swift; sourceTree = "<group>"; };
-		B3F1B14A133FBD9D8FF32DFC /* OneEuroFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneEuroFilter.swift; sourceTree = "<group>"; };
-		DDFB6C55D2A9E6DE72955AFA /* PageSwipeStateMachine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageSwipeStateMachine.swift; sourceTree = "<group>"; };
-		0A23B39DDD0DF7EA3C86AA3E /* PointerMapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PointerMapping.swift; sourceTree = "<group>"; };
-		4293815F885DE9144E20AD9D /* PoseClassifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseClassifier.swift; sourceTree = "<group>"; };
-		A5006E53AF133C795BCDD126 /* VolumeGestureStateMachine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VolumeGestureStateMachine.swift; sourceTree = "<group>"; };
-		52AA851C3B07394F43835BDE /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Resources/AppIcon.icns; sourceTree = "<group>"; };
 		9CCF2942FF4C46194B9CAAB8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		716F7476E7BF8E8243604C1E /* HandMark.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = HandMark.entitlements; sourceTree = "<group>"; };
-		DF50764AA965B4CE124D3BA8 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
+		A2C7CF46A0DDFE6C8359F4D8 /* BrushModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrushModel.swift; sourceTree = "<group>"; };
+		A5006E53AF133C795BCDD126 /* VolumeGestureStateMachine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VolumeGestureStateMachine.swift; sourceTree = "<group>"; };
+		B3F1B14A133FBD9D8FF32DFC /* OneEuroFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneEuroFilter.swift; sourceTree = "<group>"; };
+		C1826C13F1B932B4F75C2C41 /* GesturePriorityCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GesturePriorityCoordinator.swift; sourceTree = "<group>"; };
+		DCD5FAFF94E46B68C0FDA9ED /* PresentationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresentationController.swift; sourceTree = "<group>"; };
+		DDFB6C55D2A9E6DE72955AFA /* PageSwipeStateMachine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageSwipeStateMachine.swift; sourceTree = "<group>"; };
+		E33E46C5D3DEF68AAE43A70A /* assets/menubar/MenuBarIconDark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = assets/menubar/MenuBarIconDark.png; sourceTree = "<group>"; };
+		FE348DD2272B030F0964DF17 /* PowerPointController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerPointController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,18 +60,27 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C3BD07E20700D303ABCF0317 /* CoreAudio.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6C1B3A8C4FABD5266BAE3CAA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				52AA851C3B07394F43835BDE /* Resources/AppIcon.icns */,
+				E33E46C5D3DEF68AAE43A70A /* assets/menubar/MenuBarIconDark.png */,
+				1C411E96A708DFF7AEC54E2B /* assets/menubar/MenuBarIconLight.png */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
 		9F20F5961530BF563FE0E26A = {
 			isa = PBXGroup;
 			children = (
 				9CCF2942FF4C46194B9CAAB8 /* Info.plist */,
-				716F7476E7BF8E8243604C1E /* HandMark.entitlements */,
+				14E28F4F3BA200FCA50B1010 /* HandMark-Direct.entitlements */,
 				A1A59D8110C010B8E1585B34 /* HandMark */,
 				B312DFCD7DD6854C538320A7 /* HandMarkCore */,
 				6C1B3A8C4FABD5266BAE3CAA /* Resources */,
@@ -75,8 +91,10 @@
 		A1A59D8110C010B8E1585B34 /* HandMark */ = {
 			isa = PBXGroup;
 			children = (
-				437DA3B25ECB5DC4150A4A93 /* main.swift */,
+				FE348DD2272B030F0964DF17 /* PowerPointController.swift */,
+				DCD5FAFF94E46B68C0FDA9ED /* PresentationController.swift */,
 				90DE9F0A8E42345FD37CD738 /* SystemVolumeController.swift */,
+				437DA3B25ECB5DC4150A4A93 /* main.swift */,
 			);
 			name = HandMark;
 			path = Sources/HandMark;
@@ -103,28 +121,12 @@
 			path = Sources/HandMarkCore;
 			sourceTree = "<group>";
 		};
-		6C1B3A8C4FABD5266BAE3CAA /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				52AA851C3B07394F43835BDE /* AppIcon.icns */,
-			);
-			name = Resources;
-			sourceTree = "<group>";
-		};
 		ECF2B0E9511D497A619958E6 /* Products */ = {
 			isa = PBXGroup;
 			children = (
 				7823E65A39D2C6A4E759AE5C /* HandMark.app */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		24334872BA9B2979C895DACF /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				DF50764AA965B4CE124D3BA8 /* CoreAudio.framework */,
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -185,7 +187,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				01E02204ED7F2B5A3EA8D9B0,
+				01E02204ED7F2B5A3EA8D9B0 /* Resources/AppIcon.icns in Resources */,
+				450DC5A7E239C5C7944FFB2F /* assets/menubar/MenuBarIconDark.png in Resources */,
+				976F6DB2C2C1399F216D0B95 /* assets/menubar/MenuBarIconLight.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -196,27 +200,57 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				48E64A2907A7498D225B64D4,
-				CD7BD74B4B37584F82E15567,
-				5CD9B14389D9C3BF063E7370,
-				BD15D6E68137C003848F9415,
-				B1C153C3E70BC93ABFA23551,
-				6FBEBC1AA0F2D33C7F0458B1,
-				FEBB1999694E759454EC207A,
-				34D38EABE18F08D73B0211E1,
-				297EA38741CE344D03C7C939,
-				3FD896EF73CA4EBE39E3351F,
-				D1691DB136FECA3719765BF1,
-				D21929337EB43B83485DB188,
-				5177386D3977286A55613DA5,
-				78CE61566FA5DBE953C88384,
-				C64762FB2D848F0FD450C981,
+				98517CBF31371907C3103B53 /* PowerPointController.swift in Sources */,
+				9E79B8D088D55BBD05E7BD83 /* PresentationController.swift in Sources */,
+				CD7BD74B4B37584F82E15567 /* SystemVolumeController.swift in Sources */,
+				48E64A2907A7498D225B64D4 /* main.swift in Sources */,
+				5CD9B14389D9C3BF063E7370 /* BrushModel.swift in Sources */,
+				BD15D6E68137C003848F9415 /* ClearGestureStateMachine.swift in Sources */,
+				B1C153C3E70BC93ABFA23551 /* DrawState.swift in Sources */,
+				6FBEBC1AA0F2D33C7F0458B1 /* Gesture.swift in Sources */,
+				FEBB1999694E759454EC207A /* GesturePriorityCoordinator.swift in Sources */,
+				34D38EABE18F08D73B0211E1 /* KnobGestureStateMachine.swift in Sources */,
+				297EA38741CE344D03C7C939 /* LaserStateMachine.swift in Sources */,
+				3FD896EF73CA4EBE39E3351F /* Metrics.swift in Sources */,
+				D1691DB136FECA3719765BF1 /* OneEuroFilter.swift in Sources */,
+				D21929337EB43B83485DB188 /* PageSwipeStateMachine.swift in Sources */,
+				5177386D3977286A55613DA5 /* PointerMapping.swift in Sources */,
+				78CE61566FA5DBE953C88384 /* PoseClassifier.swift in Sources */,
+				C64762FB2D848F0FD450C981 /* VolumeGestureStateMachine.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		6ACDD28B3F82826400E39E2A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = "HandMark-Direct.entitlements";
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 47XLDWC395;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.handmark.HandMark;
+				PRODUCT_NAME = HandMark;
+				SKIP_INSTALL = NO;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 		A9269584714AE1864FC99A0E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -224,23 +258,51 @@
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				SDKROOT = macosx;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				ENABLE_TESTABILITY = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		E3B15A2E4D9E2E13AFF8130F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = "HandMark-Direct.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 47XLDWC395;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.handmark.HandMark;
+				PRODUCT_NAME = HandMark;
+				SKIP_INSTALL = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -251,6 +313,8 @@
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -260,81 +324,28 @@
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				ENABLE_NS_ASSERTIONS = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
-			};
-			name = Release;
-		};
-		E3B15A2E4D9E2E13AFF8130F /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = HandMark.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = HG3Y3TSXQT;
-				ENABLE_HARDENED_RUNTIME = YES;
-				ENABLE_APP_SANDBOX = YES;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.handmark.HandMark;
-				PRODUCT_NAME = HandMark;
-				SKIP_INSTALL = NO;
-				SWIFT_VERSION = 5.0;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
-			};
-			name = Debug;
-		};
-		6ACDD28B3F82826400E39E2A /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = HandMark.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = HG3Y3TSXQT;
-				ENABLE_HARDENED_RUNTIME = YES;
-				ENABLE_APP_SANDBOX = YES;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.handmark.HandMark;
-				PRODUCT_NAME = HandMark;
-				SKIP_INSTALL = NO;
-				SWIFT_VERSION = 5.0;
-				CODE_SIGN_IDENTITY = "Apple Distribution";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		A3A42292C863FB6D8265061F /* Build configuration list for PBXProject "HandMark" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				A9269584714AE1864FC99A0E /* Debug */,
-				EE1641454ED3801EFDC029C8 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		24FC65B57327A8E6566C1428 /* Build configuration list for PBXNativeTarget "HandMark" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E3B15A2E4D9E2E13AFF8130F /* Debug */,
 				6ACDD28B3F82826400E39E2A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A3A42292C863FB6D8265061F /* Build configuration list for PBXProject "HandMark" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A9269584714AE1864FC99A0E /* Debug */,
+				EE1641454ED3801EFDC029C8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

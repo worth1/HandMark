@@ -28,6 +28,8 @@ public struct PageSwipeStateMachine {
     private var cooldownStart: TimeInterval = 0
     /// armed 期间手形失效的起始时刻；nil 表示当前手形正常。
     private var poseLostSince: TimeInterval? = nil
+    /// waitReset 期间「手型已解除」的起始时刻；用于去抖，避免回摆途中手形短暂抖动即提前解锁。
+    private var resetReleasedSince: TimeInterval? = nil
 
     public init() {}
 
@@ -59,6 +61,7 @@ public struct PageSwipeStateMachine {
             if phase == .waitReset && !handPresent {
                 phase = .idle
                 poseLostSince = nil
+                resetReleasedSince = nil
             }
             return .none
         }
@@ -121,14 +124,11 @@ public struct PageSwipeStateMachine {
 
         case .cooldown:
             if (now - cooldownStart) * 1000 >= config.cooldownMs {
-                // 冷却结束：若双指手型仍保持，进入 waitReset 等待「解除手型」，
-                // 否则（手已离开/手型已变）直接回 idle。
-                // 关键：避免挥完后的自然回摆被当成反向挥动 → 误翻回上一页。
-                if page.matched && page.reliable && hasRef {
-                    phase = .waitReset
-                } else {
-                    phase = .idle
-                }
+                // 冷却结束：无论此时手型是否仍保持，都进入 waitReset 等待「解除手型」。
+                // 旧逻辑在冷却结束且手型短暂丢失时直接回 idle，导致回摆途中手型一掉就解锁、
+                // 回摆被误判为反向翻页。现统一进入 waitReset，只有手型被**稳定解除**才解锁。
+                phase = .waitReset
+                resetReleasedSince = nil
                 holdStart = nil
             }
             return .none
@@ -136,10 +136,18 @@ public struct PageSwipeStateMachine {
         case .waitReset:
             // 已翻一页：必须「双指手型先解除」（或手离开画面）才允许再次 armed。
             // 回摆/继续比着 ✌️ 不动都不算「解除」，因此不会触发第二次翻页。
+            // 手型在回摆途中可能短暂丢失（Vision 抖动），用 poseLossToleranceMs 去抖：
+            // 只有持续解除达到容忍窗，才真正解锁，避免一帧掉线就提前解锁导致回摆误翻。
             if !(page.matched && page.reliable) || !hasRef {
-                phase = .idle
-                holdStart = nil
-                poseLostSince = nil
+                if resetReleasedSince == nil { resetReleasedSince = now }
+                if (now - (resetReleasedSince ?? now)) * 1000 >= config.poseLossToleranceMs {
+                    phase = .idle
+                    holdStart = nil
+                    poseLostSince = nil
+                    resetReleasedSince = nil
+                }
+            } else {
+                resetReleasedSince = nil
             }
             return .none
         }
