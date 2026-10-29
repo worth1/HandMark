@@ -39,24 +39,26 @@ final class PointerFilterTests: XCTestCase {
         XCTAssertTrue(f.isInitialized)
     }
 
-    func testZeroOrNegativeDeltaResetsInsteadOfDividingByZero() {
+    func testZeroOrNegativeDeltaHoldsPreviousOutput() {
         var f = OneEuroFilter1D()
         _ = f.filter(100, timestamp: 1.0)
         let out = f.filter(500, timestamp: 1.0)   // dt == 0
-        XCTAssertEqual(out, 500, accuracy: 1e-9, "dt<=0 时重锚，不得产生 NaN 或崩溃")
+        XCTAssertEqual(out, 100, accuracy: 1e-9, "dt<=0 时保持上一帧输出，不得产生 NaN 或崩溃")
         XCTAssertTrue(out.isFinite)
         let back = f.filter(500, timestamp: 0.5)  // dt < 0
+        XCTAssertEqual(back, 100, accuracy: 1e-9, "dt<0 时同样保持上一帧输出，不跳变、不崩溃")
         XCTAssertTrue(back.isFinite)
     }
 
-    func testLargeGapResetsInsteadOfDrawingLongLine() {
+    func testLargeGapHoldsPreviousOutputInsteadOfLongLine() {
         var f = OneEuroFilter1D(config: OneEuroConfig(maxDeltaT: 0.25))
         _ = f.filter(100, timestamp: 0.0)
         for i in 1..<10 { _ = f.filter(100, timestamp: Double(i) * dt) }
-        // 手部丢失 2 秒后在新位置出现
+        // 手部丢失 2 秒后在新位置出现：恢复首帧必须保持丢失前的位置（不插值），
+        // 下一帧起自动收敛到新位置；跨中断的笔画已被 seal，不会把两段连成一条长线（需求 6.2）。
         let out = f.filter(1400, timestamp: 10.0)
-        XCTAssertEqual(out, 1400, accuracy: 1e-9,
-                       "丢失后恢复必须重锚，不允许平滑跨越产生长线（需求 6.2）")
+        XCTAssertEqual(out, 100, accuracy: 1e-9,
+                       "丢失后恢复首帧必须保持原位置，不得平滑跨越产生长线（需求 6.2）")
     }
 
     func testNonFiniteInputDoesNotPoisonState() {
@@ -155,12 +157,12 @@ final class PointerFilterTests: XCTestCase {
         XCTAssertEqual(second.x, 150, accuracy: 1e-9, "α=0.5 时应取中点")
     }
 
-    func testLegacyEMAResetsOnLargeGap() {
+    func testLegacyEMAHoldsOnLargeGap() {
         var f = LegacyEMAFilter2D(alpha: 0.5)
         _ = f.filter(CGPoint(x: 0, y: 0), timestamp: 0)
         _ = f.filter(CGPoint(x: 100, y: 0), timestamp: dt)
         let out = f.filter(CGPoint(x: 1200, y: 0), timestamp: 5.0)   // 间隔 5 秒
-        XCTAssertEqual(out.x, 1200, accuracy: 1e-9, "长间隔后重锚，避免拖尾长线")
+        XCTAssertEqual(out.x, 50, accuracy: 1e-9, "长间隔后保持上一帧位置，避免拖尾长线")
     }
 
     func testLegacyEMAResetClearsState() {

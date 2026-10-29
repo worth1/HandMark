@@ -79,10 +79,16 @@ enum PointerFilterMode: Equatable { case legacyEMA, oneEuro }
 let POINTER_FILTER_MODE: PointerFilterMode = .oneEuro
 
 /// 1€ Filter 参数（调试起点，见 OneEuroFilter.swift 说明）。
-let ONE_EURO_MIN_CUTOFF = 1.0     // 最小截止频率(Hz)：越小越稳，起步越黏
+///
+/// `ONE_EURO_MIN_CUTOFF` 从 1.0 降到 0.5：实测绘画抖动的主因是**次低频漂移**
+/// （呼吸/坐姿晃动/光照/热噪，能量集中在 <1Hz），1.0Hz 的静止截止频率几乎压不住它，
+/// 导致直线在 1 秒内漂移近 20px。降到 0.5Hz 可明显抑制这段漂移；
+/// 而移动时 `beta` 会自动拉高截止频率，跟手度不受影响（100px 阶跃稳定时间仍约 2 帧）。
+/// 若真实摄像头实测仍有残留慢漂移，可继续下探到 0.3~0.4（代价是起笔更"黏"，对绘画可接受）。
+let ONE_EURO_MIN_CUTOFF = 0.5     // 最小截止频率(Hz)：越小越稳，起步越黏
 let ONE_EURO_BETA = 0.02          // 速度系数：越大越跟手，快速段噪声越大
 let ONE_EURO_D_CUTOFF = 1.0       // 速度估计的截止频率(Hz)
-let ONE_EURO_MAX_DELTA_T = 0.25   // 采样间隔上限(秒)：超过即重锚，防跨越丢失区间长线
+let ONE_EURO_MAX_DELTA_T = 0.25   // 采样间隔上限(秒)：超过即保持原位重锚，防跨越丢失区间长线
 
 /// 笔尖定位方案。默认沿用现有「食指尖」；`.pinchMidpoint` 为候选实验（捏合时取拇指尖与食指尖中点，
 /// 两点平均可降低单点噪声，但会改变笔尖与手指的相对位置），切换后需重新实测。
@@ -1661,8 +1667,11 @@ extension HandTracker {
     }
 
     private func resetPointerFilter() {
-        oneEuro.reset()
-        legacyEMA.reset()
+        // 重锚落位：把滤波器内部状态接到「最近一次已确认的光点位置」，而非清空。
+        // 这样恢复后首帧不会从原始（带噪）坐标跳变；跨中断的笔画已被 seal，不会连线。
+        let seat = smoothed ?? lastTip
+        oneEuro.seed(seat)
+        legacyEMA.seed(seat)
         filterResetCount += 1
     }
 

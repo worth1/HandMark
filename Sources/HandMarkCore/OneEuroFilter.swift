@@ -61,6 +61,17 @@ public struct OneEuroFilter1D {
         tPrev = 0
     }
 
+    /// 把内部状态落到指定值（重锚落位，不跳变）。
+    ///
+    /// 用于手部恢复 / 追踪中断后：把滤波器「接」到最近一次已确认的位置，
+    /// 使恢复后首帧**不会**从原始（带噪）坐标跳变。不更新 `tPrev`，
+    /// 这样恢复后首帧会命中「异常间隔」分支保持原位，下一帧起正常平滑并自动追上去。
+    public mutating func seed(_ value: Double) {
+        initialized = true
+        xPrev = value
+        dxPrev = 0
+    }
+
     /// 低通系数：α = 1 / (1 + τ/dt)，τ = 1 / (2π·fc)。
     private func alpha(cutoff: Double, dt: Double) -> Double {
         let tau = 1.0 / (2.0 * .pi * max(cutoff, 1e-6))
@@ -68,7 +79,7 @@ public struct OneEuroFilter1D {
     }
 
     /// 推入一个新采样。
-    /// - Returns: 滤波后的值。首帧、异常间隔、非有限值都会触发重新初始化并返回原始值。
+    /// - Returns: 滤波后的值。首帧、异常间隔、非有限值都会触发重新初始化或保持。
     @discardableResult
     public mutating func filter(_ value: Double, timestamp: Double) -> Double {
         guard value.isFinite, timestamp.isFinite else { return lastOr(value) }
@@ -81,12 +92,12 @@ public struct OneEuroFilter1D {
             return value
         }
         let dt = timestamp - tPrev
-        // 异常间隔（首帧重复时间戳、丢帧、长时间丢失后恢复）：不做平滑，直接重锚。
+        // 异常间隔（首帧重复时间戳、丢帧、长时间丢失后恢复）：**保持上一帧滤波输出**，
+        // 不跳变到原始（带噪）位置。下一帧恢复正常后，速度估计会自动拉高 cutoff 追上去；
+        // 且跨中断的笔画已被调用方 seal，不会把两段笔迹连成一条线。
         if !dt.isFinite || dt <= 0 || dt > config.maxDeltaT {
-            xPrev = value
-            dxPrev = 0
             tPrev = timestamp
-            return value
+            return xPrev
         }
 
         let dx = (value - xPrev) / dt
@@ -125,6 +136,12 @@ public struct OneEuroFilter2D {
         fy.reset()
     }
 
+    /// 重锚落位：把 x/y 两轴内部状态同时落到指定点（不跳变，见 `OneEuroFilter1D.seed`）。
+    public mutating func seed(_ point: CGPoint) {
+        fx.seed(Double(point.x))
+        fy.seed(Double(point.y))
+    }
+
     public mutating func filter(_ point: CGPoint, timestamp: Double) -> CGPoint {
         CGPoint(x: fx.filter(Double(point.x), timestamp: timestamp),
                 y: fy.filter(Double(point.y), timestamp: timestamp))
@@ -149,14 +166,20 @@ public struct LegacyEMAFilter2D {
         lastTimestamp = nil
     }
 
+    /// 重锚落位：把内部状态落到指定点（不跳变）。不更新 `lastTimestamp`，
+    /// 使恢复首帧命中「异常间隔」分支保持原位。
+    public mutating func seed(_ point: CGPoint) {
+        value = point
+    }
+
     public mutating func filter(_ point: CGPoint, timestamp: Double) -> CGPoint {
-        // 与 1€ 一致：异常间隔（回退/重复/超大间隔）直接重锚，不做平滑跨越。
+        // 与 1€ 一致：异常间隔（回退/重复/超大间隔）**保持**上一帧输出（不跳变），
+        // 不做平滑跨越、也不跳到原始坐标。
         if let t = lastTimestamp {
             let dt = timestamp - t
             if !dt.isFinite || dt <= 0 || dt > 0.25 {
-                value = point
                 lastTimestamp = timestamp
-                return point
+                return value ?? point
             }
         }
         lastTimestamp = timestamp
