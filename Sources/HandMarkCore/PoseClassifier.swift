@@ -100,6 +100,14 @@ public let POSE_MIN_PINCH_GAP = 0.35
 /// 放宽到 0.48 仅接纳自然微屈，仍能可靠区分「手枪/捏合」等中指明显蜷曲的手形
 /// （其 curl 明显低于 0.4，与 0.48 之间有清晰空档）。
 public let PAGE_STRAIGHT_CURL_MIN = 0.48
+/// 翻页「中指」伸直的 curl 下限（独立参数，数据标定）。
+///
+/// 与食指共用通用下限 0.48 时，双指挥动过程中中指随手掌侧转/前推会自然微屈，
+/// 实测 curl 常落在 0.34~0.43，被 0.48 误判为「未伸直」→ 双指手形在挥动中掉线
+/// （日志典型：中0.38/ratio1.38、中0.34/ratio1.58 均被拒）。放宽到 0.33 接纳自然微屈，
+/// 仍由 straightenRatio>=1.28 双判据兜底：真握拳（比值≤1.15）不会被放过
+/// （日志中 中0.29/ratio0.83 即被正确拒）。
+public let PAGE_MIDDLE_CURL_MIN = 0.33
 /// 翻页「伸直」的 straightenRatio 下限（通用值 1.35 → 1.28）。
 public let PAGE_STRAIGHT_RATIO_MIN = 1.28
 /// 翻页手形的拇指-食指张开度下限（通用值 0.35 → 0.25）。
@@ -441,11 +449,16 @@ public struct PageDiag: Equatable {
 }
 
 /// 翻页手形的「伸直」判据（专用放宽阈值）。
+///
+/// 中指使用独立、更宽松的 curl 下限（双指挥动时自然微屈，见 `PAGE_MIDDLE_CURL_MIN`），
+/// 其余手指沿用通用页面下限 `PAGE_STRAIGHT_CURL_MIN`；所有手指仍需满足
+/// `straightenRatio >= PAGE_STRAIGHT_RATIO_MIN` 这一方向校验。
 @inline(__always)
 private func isStraightPage(_ f: FingerFeature, palmBase base: Double, wrist: CGPoint,
                             kind: FingerKind) -> Bool {
+    let floor = (kind == .middle) ? PAGE_MIDDLE_CURL_MIN : PAGE_STRAIGHT_CURL_MIN
     guard let c = curlRatio(f, palmBase: base) else { return false }
-    return c > PAGE_STRAIGHT_CURL_MIN * curlScale(kind) &&
+    return c > floor * curlScale(kind) &&
            straightenRatio(f, wrist: wrist) >= PAGE_STRAIGHT_RATIO_MIN
 }
 

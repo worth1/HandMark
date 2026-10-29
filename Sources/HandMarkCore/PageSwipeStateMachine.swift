@@ -28,6 +28,8 @@ public struct PageSwipeStateMachine {
     private var cooldownStart: TimeInterval = 0
     /// armed 期间手形失效的起始时刻；nil 表示当前手形正常。
     private var poseLostSince: TimeInterval? = nil
+    /// idle 进入侧「手形丢失」的起始时刻；用于进入去抖，避免单帧抖动清空 holdStart。
+    private var holdLostSince: TimeInterval? = nil
     /// waitReset 期间「手型已解除」的起始时刻；用于去抖，避免回摆途中手形短暂抖动即提前解锁。
     private var resetReleasedSince: TimeInterval? = nil
 
@@ -70,6 +72,10 @@ public struct PageSwipeStateMachine {
         case .idle:
             if page.matched && page.reliable && hasRef {
                 // 手形成立：开始稳定计时（首次进入记录起点）。
+                // 进入侧去抖：本帧成立即清掉丢失计时，与「退出侧」(armed/waitReset 的
+                // poseLostSince/resetReleasedSince) 相互独立——单帧抖动既不会打断进入进度，
+                // 也不会误判成退出，避免「比了半天却因一两帧掉线而翻不了页」。
+                holdLostSince = nil
                 if holdStart == nil {
                     holdStart = now
                     // 关键（V4.1 跟手）：确认期一开始就记录参考点。用户往往是「边伸出双指边挥」，
@@ -97,7 +103,17 @@ public struct PageSwipeStateMachine {
                     return evaluateSwipe(refPoint: refPoint, now: now, config: config)
                 }
             } else {
-                holdStart = nil   // 手形不成立，重置稳定计时
+                // 进入侧去抖：只有「连续」丢失超过 poseLossToleranceMs 才清空 holdStart，
+                // 稳定窗内的零星掉帧（Vision 抖动常态）被本分支吸收，不会从头计时。
+                if holdStart != nil {
+                    if holdLostSince == nil { holdLostSince = now }
+                    if (now - (holdLostSince ?? now)) * 1000 >= config.poseLossToleranceMs {
+                        holdStart = nil
+                        holdRefX = 0
+                        holdRefY = 0
+                        holdLostSince = nil
+                    }
+                }
             }
             return .none
 

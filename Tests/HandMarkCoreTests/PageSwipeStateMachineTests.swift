@@ -183,4 +183,38 @@ final class PageSwipeStateMachineTests: XCTestCase {
         _ = sm.step(page: page(true), refPoint: p(0.6), hasRef: true, suspended: true, handPresent: true, now: 0.30, config: cfg)
         XCTAssertEqual(sm.phase, .idle)
     }
+
+    /// 进入侧去抖：holdMs 稳定窗内出现单帧手形抖动（page.matched 短暂 false），
+    /// 只要连续丢失 < poseLossToleranceMs，holdStart 不应被清空，稳定窗结束后仍应 armed。
+    /// 修复「比了半天却因一两帧掉线而翻不了页」。
+    func testEnterDebounceToleratesBriefDrop() {
+        var sm = PageSwipeStateMachine()
+        // 第 1 帧匹配，holdStart 起点 t=0.0
+        _ = sm.step(page: page(true), refPoint: p(0.4), hasRef: true, suspended: false, handPresent: true, now: 0.0, config: cfg)
+        // 第 2 帧抖动丢失（t=0.033），< 350ms 容忍 → holdStart 保留（去抖吸收）
+        _ = sm.step(page: page(false), refPoint: p(0.4), hasRef: true, suspended: false, handPresent: true, now: 0.033, config: cfg)
+        // 第 3 帧恢复匹配（t=0.066），累计真实时间 66ms < holdMs(100)，尚未 armed
+        _ = sm.step(page: page(true), refPoint: p(0.4), hasRef: true, suspended: false, handPresent: true, now: 0.066, config: cfg)
+        XCTAssertEqual(sm.phase, .idle, "稳定窗未到，仍应 idle")
+        // 继续匹配到 t=0.10（真实时间累计 100ms，抖动期间不重置）→ 应 armed
+        let out = sm.step(page: page(true), refPoint: p(0.4), hasRef: true, suspended: false, handPresent: true, now: 0.10, config: cfg)
+        XCTAssertEqual(sm.phase, .armed, "进入侧去抖：抖动不应清空 holdStart，稳定窗满后应 armed")
+        XCTAssertEqual(out, .none)
+    }
+
+    /// 进入侧去抖的失效边界：手形连续丢失超过 poseLossToleranceMs，holdStart 必须清空，
+    /// 需重新稳定 holdMs 才能再次 armed（避免「手已移开却还翻页」）。
+    func testEnterDebounceResetsAfterLongLoss() {
+        var sm = PageSwipeStateMachine()
+        _ = sm.step(page: page(true), refPoint: p(0.4), hasRef: true, suspended: false, handPresent: true, now: 0.0, config: cfg)
+        // 连续丢失：t=0.20 起算 holdLostSince，到 t=0.55 累计 350ms >= 容忍窗 → 清空 holdStart
+        _ = sm.step(page: page(false), refPoint: p(0.4), hasRef: true, suspended: false, handPresent: true, now: 0.20, config: cfg)
+        _ = sm.step(page: page(false), refPoint: p(0.4), hasRef: true, suspended: false, handPresent: true, now: 0.55, config: cfg)
+        XCTAssertEqual(sm.phase, .idle, "连续丢失超容忍窗后 holdStart 应清空")
+        // 重新匹配再稳定 holdMs（t=0.60 → 0.75）→ 才能再次 armed
+        _ = sm.step(page: page(true), refPoint: p(0.4), hasRef: true, suspended: false, handPresent: true, now: 0.60, config: cfg)
+        XCTAssertEqual(sm.phase, .idle, "重新计时初期仍应 idle")
+        _ = sm.step(page: page(true), refPoint: p(0.4), hasRef: true, suspended: false, handPresent: true, now: 0.75, config: cfg)
+        XCTAssertEqual(sm.phase, .armed, "重新稳定 holdMs 后应再次 armed")
+    }
 }
