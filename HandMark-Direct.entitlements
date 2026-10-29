@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!--
+      直发渠道（Developer ID 公证 / Apple Development 本机调试）使用的 entitlements。
+
+      故意**不开 App Sandbox**：
+        翻页功能依赖 CGEvent.postToPid 向 WPS/PowerPoint 进程定向投递按键事件，
+        而 App Sandbox 会禁止跨进程事件投递，与翻页功能结构性互斥
+        （Apple DTS 已确认）。App Store 上架请用 HandMark.entitlements + package_appstore.sh。
+
+      · device.camera            —— 手势识别的唯一输入源
+      · automation.apple-events  —— PowerPoint 走 AppleScript 控制所需
+    -->
+    <key>com.apple.security.device.camera</key>
+    <true/>
+    <key>com.apple.security.automation.apple-events</key>
+    <true/>
+</dict>
+</plist>

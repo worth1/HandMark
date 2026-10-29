@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- App Store（Mac App Store）要求：必须开启 App Sandbox -->
+    <key>com.apple.security.app-sandbox</key>
+    <true/>
+    <!-- 摄像头：手势识别的唯一输入源 -->
+    <key>com.apple.security.device.camera</key>
+    <true/>
+    <!-- 只读访问「用户用拖拽/打开面板选择过」的文件：本应用不使用，保持最小权限 -->
+    <!-- 日志与标定数据一律写到沙盒容器内的 Library 目录，无需任何文件临时例外 -->
+</dict>
+</plist>

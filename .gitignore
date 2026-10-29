@@ -1,0 +1,23 @@
+# ===== SwiftPM 构建产物 =====
+.build/
+.swiftpm/
+
+# ===== Xcode 派生数据 =====
+build/DerivedData/
+
+# ===== 临时签名测试 App / 探测工程产物（显式列出，不使用 *.app 通配以免误忽略正式交付）=====
+HandMark-SignedTest.app/
+HandMark.app.phase2-baseline/
+tools/EventPostProbe/.build/
+tools/EventPostProbe/EventPostProbe.app/
+tools/EventPostProbe/EventPostProbe-SignedTest.app/
+tools/EventPostProbe/ProbeCLI.app/
+
+# ===== 由 build.sh 重新生成的资源（非源码）=====
+Resources/AppIcon.icns
+
+# ===== macOS 杂项 =====
+.DS_Store
+
+# ===== WorkBuddy 项目数据（非源码，不纳入版本库）=====
+.workbuddy/

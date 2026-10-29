@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleName</key>
+    <string>HandMark</string>
+    <key>CFBundleDisplayName</key>
+    <string>HandMark</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.handmark.HandMark</string>
+    <key>CFBundleExecutable</key>
+    <string>HandMark</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>13.0</string>
+    <key>LSApplicationCategoryType</key>
+    <string>public.app-category.graphics-design</string>
+    <key>LSUIElement</key>
+    <true/>
+    <key>NSCameraUsageDescription</key>
+    <string>HandMark 需要使用摄像头识别手部动作，以实现隔空绘画。</string>
+    <key>NSAppleEventsUsageDescription</key>
+    <string>HandMark 需要控制 Microsoft PowerPoint，以便用手势翻页。</string>
+    <key>NSHumanReadableCopyright</key>
+    <string>Copyright © 2026 HandMark. All rights reserved.</string>
+    <key>ITSAppUsesNonExemptEncryption</key>
+    <false/>
+</dict>
+</plist>
